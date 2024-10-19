@@ -1,0 +1,62 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+bool check[33][33];
+int f[31][65];
+
+bool check_bit(int a, int b, int k) {
+	if(k == 1) {
+		return 1;
+	}
+	int i = 0;
+	while(i < k - 1) {
+		if((((a >> i) & 1) == ((a >> (i + 1)) & 1)) && (((b >> i) & 1) == ((b >> (i + 1)) & 1)) && (((a >> i) & 1) == ((b >> i) & 1))) {
+			return 0;
+		} else {
+			++i;
+		}
+	}
+	return 1;
+}
+
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(0);
+	cout.tie(0);
+    int t;
+    cin >> t;
+	int mux = 33;
+    while(t--) {
+    	int m, n;
+    	cin >> m >> n;
+    	int x = max(m, n);
+    	int y = min(m, n);
+    	m = x;
+    	n = y;
+    	for(int i = 0; i < mux; ++i) {
+	    	for(int j = 0; j < mux; ++j) {
+	    		check[i][j] = check_bit(i, j, n);
+			}
+		}
+		memset(f, 0, sizeof(f));
+		for(int i = 0; i < (1 << n); ++i) {
+			f[1][i] = 1;
+		}
+		for(int i = 2; i <= m; i++) {
+			for(int mask_1 = 0; mask_1 < (1 << n); mask_1++) {
+				for(int mask_2 = 0; mask_2 < (1 << n); mask_2++) {
+					if(check[mask_1][mask_2]) {
+						f[i][mask_1] += f[i - 1][mask_2];
+					}
+				}
+			}
+		}
+		long long res = 0;
+		for(int i = 0; i < (1 << n); ++i) {
+			res += f[m][i];
+		}
+		cout << res << endl;
+	}
+}
