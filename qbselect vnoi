@@ -1,0 +1,88 @@
+#include<bits/stdc++.h>
+#define bit(mask, i) ((mask >> i) & 1)
+
+using namespace std;
+
+int a[4][10001];
+int f[17][10001];
+bool check[17][17], test[17];
+
+void build() {
+	for(int i = 0; i < 17; ++i) {
+		for(int j = 0; j < 17; ++j) {
+			if(i & j) {
+				check[i][j] = 0;
+			} else check[i][j] = 1;
+		}
+	}
+	for(int i = 0; i < 17; ++i) {
+		int cnt = 0;
+		for(int j = 0; j < 3; ++j) {
+			if(bit(i, j) && bit(i, j + 1)) {
+				test[i] = 0;
+				++cnt;
+			}
+		}
+		if(!cnt) {
+			test[i] = 1;
+		}
+	}
+}
+
+int sum(int mask, int k) {
+	int res = 0;
+	for(int i = 0; i < 4; ++i) {
+		if(bit(mask, i)) {
+			res += a[i][k];
+		}
+	}
+	return res;
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
+	cout.tie(nullptr);
+	int n;
+	cin >> n;
+	build();
+	int cnt = 0;
+	int nega = -1e9;
+	for(int i = 0; i < 4; ++i) {
+		for(int j = 0; j < n; ++j) {
+			cin >> a[i][j];
+			if(a[i][j] <= 0) {
+				nega = max(nega, a[i][j]);
+			} else {
+				++cnt;
+			}
+		}
+	}
+	if(!cnt) {
+		cout << nega;
+		return 0;
+	}
+	for(int i = 0; i < 16; ++i) {
+		f[i][0] = sum(i, 0);
+	}
+	for(int i = 1; i < n; ++i) {
+		for(int mask = 0; mask < 16; ++mask) {
+			if(test[mask]) {
+				for(int pre_mask = 0; pre_mask < 16; ++pre_mask) {
+					if(test[pre_mask]) {
+						if(check[mask][pre_mask]) {
+							f[mask][i] = max(f[mask][i], f[pre_mask][i - 1] + sum(mask, i));
+						}
+					}
+				}
+			}
+		}
+	}
+	int res = 0;
+	for(int i = 0; i < 16; ++i) {
+		if(test[i]) {
+			res = max(res, f[i][n - 1]);
+		}
+	}
+	cout << res;
+}
