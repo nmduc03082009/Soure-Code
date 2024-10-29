@@ -1,0 +1,95 @@
+#include<bits/stdc++.h>
+#define bit(mask, i) ((mask >> i) & 1)
+
+using namespace std;
+
+int a[8][10001]; 
+long long f[257][10001];
+int check[257][257], test[257];
+
+void chill() {
+	for(int i = 0; i < 257; ++i) {
+		int cnt = 0;
+		for(int j = 0; j < 8; ++j) {
+			if(bit(i, j) && bit(i, j + 1)) {
+				test[i] = 0;
+				++cnt;
+			}
+		}
+		if(!cnt) {
+			test[i] = 1;
+		}
+	}
+}
+
+int sum(int mask, int k) {
+	int res = 0;
+	for(int i = 0; i < 8; ++i) {
+		if((mask >> i) & 1) {
+			res += a[i][k];
+		}
+	}
+	return res;
+}
+
+void build() {
+	for(int i = 0; i < 257; ++i) {
+		for(int j = 0; j < 257; ++j) {
+			if(i & j) {
+				check[i][j] = 0;
+			} else {
+				check[i][j] = 1;
+			}
+		}
+	}
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
+	cout.tie(nullptr);
+	int n;
+	cin >> n;
+	int tmp = -1e9;
+	int cnt = 0;
+	for(int i = 0; i < 8; ++i) {
+		for(int j = 0; j < n; ++j) {
+			cin >> a[i][j];
+			if(a[i][j] <= 0) {
+				tmp = max(tmp, a[i][j]);
+			} else {
+				++cnt;
+			}
+		}
+	}
+	if(!cnt) {
+		cout << tmp;
+		return 0;
+	}
+	memset(f, 0, sizeof(f));
+	build();
+	chill();
+	for(int i = 0; i < 256; ++i) {
+		if(test[i]) {
+			f[i][0] = sum(i, 0);
+		}
+	}
+	for(int i = 1; i < n; ++i) {
+		for(int mask = 0; mask < 256; ++mask) {
+			if(test[mask]) {
+				for(int pre_mask = 0; pre_mask < 256; ++pre_mask) {
+					if(test[pre_mask]) {
+						if(check[mask][pre_mask]) {
+							f[mask][i] = max(f[mask][i], f[pre_mask][i - 1] + sum(mask, i));
+						}
+					}
+				}
+			}
+		}
+	}
+	long long res = 0;
+	for(int i = 0; i < 256; ++i) {
+		res = max(res, f[i][n -1]);
+	}
+	cout << res;
+}
