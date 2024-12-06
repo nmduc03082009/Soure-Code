@@ -1,0 +1,55 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+struct Tree {
+    long long h, l, r;
+};
+
+bool cmp(Tree a, Tree b) {
+    return a.h < b.h;
+}
+
+const int N = 1009;
+int n; Tree t[N];
+
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(0);
+	cout.tie(0);
+    cin >> n;
+    for(int i = 1; i <= n; ++i) {
+        long long y, x1, x2; cin >> y >> x1 >> x2;
+        x1++;
+        t[i] = Tree({y, x1, x2});
+    }
+    long long ans = 0;
+    sort(t + 1, t + n + 1, cmp);
+    for(int i = 1; i <= n; ++i) {
+        long long max_left = 0;
+        long long max_right = 0;
+        int u = t[i].l;
+        int v = t[i].r;
+        for(int j = i - 1; j > 0; --j) {
+            int left = t[j].l;
+            int right = t[j].r;
+            if(right < u || left > v) {
+                continue;
+            }
+            if(left <= u && v <= right) {
+                max_left = t[j].h;
+                max_right = t[j].h;
+                break;
+            } else {
+                if(u <= left && left <= v && v <= right) {
+                    max_right = max(max_right, t[j].h);
+                } else if(left <= u && u <= right && right <= v) {
+                    max_left = max(max_left, t[j].h);
+                }
+            }
+        }
+        ans += (t[i].h - max_left) + (t[i].h - max_right);
+    }
+    cout << ans << '\n';
+}
