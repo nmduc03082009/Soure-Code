@@ -1,0 +1,90 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+struct Node {
+    int fi, se, th;
+};
+
+bool cmp(Node a, Node b) {
+    if(a.fi == b.fi) {
+        return a.se < b.se;
+    }
+    return a.fi < b.fi;
+}
+
+const int N = 100009;
+int n; Node a[N];
+int tmp[5][N]; map<int, int> mp1, mp2;
+
+void in() {
+    for(int i = 1; i <= n; ++i) {
+        cin >> tmp[1][i];
+    }
+    for(int i = 1; i <= n; ++i) {
+        cin >> tmp[2][i];
+        mp1[tmp[2][i]]++;
+    }
+    for(int i = 1; i <= n; ++i) {
+        cin >> tmp[3][i];
+        mp2[tmp[3][i]]++;
+    }
+    for(int i = 1; i <= n; ++i) {
+        a[i] = Node({tmp[1][i], tmp[2][i], tmp[3][i]});
+    }
+}
+
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(0);
+	cout.tie(0);
+    cin >> n;
+    in();
+    sort(a + 1, a + n + 1, cmp);
+    for(int i = 1; i <= n; ++i) {
+        if(mp1.find(i) == mp1.end()) {
+            int tmp1 = a[i].se; int tmp2 = a[i].th;
+            a[i].fi = a[i].se = a[i].th = 0;
+            while(mp1[tmp1] == 1 && a[tmp1].fi) {
+                int tp = tmp1;
+                mp1.erase(tmp1);
+                tmp1 = a[tmp1].se;
+                a[tp].fi = a[tp].se = a[tp].th = 0;
+            }
+            mp1[tmp1]--;
+            while(mp2[tmp2] == 1 && a[tmp2].fi) {
+                int tp = tmp2;
+                mp2.erase(tmp2);
+                tmp2 = a[tmp2].th;
+                a[tp].fi = a[tp].th = a[tp].se = 0;
+            }
+            mp2[tmp2]--;
+        }
+        if(mp2.find(i) == mp2.end()) {
+            int tmp1 = a[i].se; int tmp2 = a[i].th;
+            a[i].fi = a[i].se = a[i].th = 0;
+            while(mp1[tmp1] == 1 && a[tmp1].fi) {
+                int tp = tmp1;
+                mp1.erase(tmp1);
+                tmp1 = a[tmp1].se;
+                a[tp].fi = a[tp].se = a[tp].th = 0;
+            }
+            mp1[tmp1]--;
+            while(mp2[tmp2] == 1 && a[tmp2].fi) {
+                int tp = tmp2;
+                mp2.erase(tmp2);
+                tmp2 = a[tmp2].th;
+                a[tp].fi = a[tp].th = a[tp].se = 0;
+            }
+            mp2[tmp2]--;
+        }
+    }
+    int cnt = 0;
+    for(int i = 1; i <= n; ++i) {
+        if(!a[i].fi) {
+            ++cnt;
+        }
+    }
+    cout << cnt << '\n';
+}
