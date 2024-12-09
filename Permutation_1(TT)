@@ -1,0 +1,70 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+int n, p; int a[50]; int ans[50];
+long long f[20][20]; long long fact[20];
+bool used[20];
+
+void build() {
+    memset(used, 0, sizeof(used));
+    fact[0] = 1;
+    for(int i = 1; i <= n; ++i) {
+        fact[i] = fact[i - 1]*i;
+    }
+    memset(f, 0, sizeof(f));
+    for(int i = 1; i <= n; ++i) {
+        for(int j = 1; j <= i; ++j) {
+            f[i][j] = j*fact[i - 1];
+        }
+    }
+}
+
+int stt(int i) {
+    if(i > n) return 1;
+    int cnt = 0;
+    for(int j = a[i] - 1; j >= 1; --j) {
+        if(!used[j]) ++cnt;
+    }
+    used[a[i]] = 1;
+    //cout << i << " " << cnt << '\n';
+    return stt(i + 1) + f[n - i + 1][cnt];
+}
+
+void get(int i) {
+    if(i > n) return;
+    for(int k = n; k >= 1; --k) {
+        if(!used[k]) {
+            int cnt = 0;
+            for(int j = k - 1; j >= 1; --j) {
+                if(!used[j]) ++cnt;
+            }
+            if(p > f[n - i + 1][cnt]) {
+                ans[i] = k;
+                used[k] = 1;
+                p -= f[n - i + 1][cnt];
+                break;
+            }
+        }
+    }
+    get(i + 1);
+}
+
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(0);
+	cout.tie(0);
+	cin >> n;
+	for(int i = 1; i <= n; ++i) {
+        cin >> a[i];
+	}
+	cin >> p;
+	build();
+	cout << stt(1) << '\n';
+	memset(used, 0, sizeof(used));
+	get(1);
+	for(int i = 1; i <= n; ++i) {
+        cout << ans[i] << " ";
+	}
+}
